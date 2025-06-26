@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roy Rangga Mandala | Futuristic Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background-color: #0a0a0a;
+        color: #e0e0e0;
+        overflow-x: hidden;
+      }
+
+      .gradient-text {
+        background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .card-glass {
+        background: rgba(15, 15, 15, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+      }
+
+      .hover-scale {
+        transition: transform 0.3s ease;
+      }
+
+      .hover-scale:hover {
+        transform: scale(1.03);
+      }
+
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+
+      .floating {
+        animation: floating 6s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .glow {
+        text-shadow: 0 0 10px rgba(0, 219, 222, 0.5);
+      }
+
+      .section-divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 219, 222, 0.5),
+          transparent
+        );
+      }
+
+      .cube-container {
+        perspective: 1000px;
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+      }
+
+      .cube {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        animation: rotate 20s infinite linear;
+      }
+
+      .cube-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 2px solid rgba(0, 219, 222, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: white;
+        background: rgba(15, 15, 15, 0.7);
+      }
+
+      .front {
+        transform: rotateY(0deg) translateZ(100px);
+      }
+      .back {
+        transform: rotateY(180deg) translateZ(100px);
+      }
+      .right {
+        transform: rotateY(90deg) translateZ(100px);
+      }
+      .left {
+        transform: rotateY(-90deg) translateZ(100px);
+      }
+      .top {
+        transform: rotateX(90deg) translateZ(100px);
+      }
+      .bottom {
+        transform: rotateX(-90deg) translateZ(100px);
+      }
+
+      @keyframes rotate {
+        from {
+          transform: rotateX(0deg) rotateY(0deg);
+        }
+        to {
+          transform: rotateX(360deg) rotateY(360deg);
+        }
+      }
+
+      .skill-bar {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .skill-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+        border-radius: 4px;
+        transition: width 1s ease-in-out;
+      }
+
+      .timeline-item {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 30px;
+      }
+
+      .timeline-item:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: linear-gradient(90deg, #00dbde, #fc00ff);
+      }
+
+      .timeline-item:after {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 20px;
+        width: 1px;
+        height: calc(100% - 15px);
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .timeline-item:last-child:after {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Floating 3D Cube -->
+    <div
+      id="cube-scene"
+      class="fixed right-10 bottom-10 z-0 opacity-20 hidden md:block"
+    ></div>
+
+    <!-- Navigation -->
+    <nav
+      class="fixed w-full z-50 bg-black bg-opacity-80 backdrop-filter backdrop-blur-lg"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <span class="text-xl font-bold gradient-text">RRM</span>
+          </div>
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-center space-x-4">
+              <a
+                href="#home"
+                class="px-3 py-2 rounded-md text-sm font-medium hover:text-purple-300 transition"
+                >Home</a
+              >
+              <a
+                href="#about"
+                class="px-3 py-2 rounded-md text-sm font-medium hover:text-purple-300 transition"
+                >About</a
+              >
+              <a
+                href="#experience"
+                class="px-3 py-2 rounded-md text-sm font-medium hover:text-purple-300 transition"
+                >Experience</a
+              >
+              <a
+                href="#skills"
+                class="px-3 py-2 rounded-md text-sm font-medium hover:text-purple-300 transition"
+                >Skills</a
+              >
+              <a
+                href="#contact"
+                class="px-3 py-2 rounded-md text-sm font-medium hover:text-purple-300 transition"
+                >Contact</a
+              >
+            </div>
+          </div>
+          <div class="md:hidden">
+            <button
+              id="mobile-menu-button"
+              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white focus:outline-none"
+            >
+              <svg
+                class="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="md:hidden hidden bg-black bg-opacity-90">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <a
+            href="#home"
+            class="block px-3 py-2 rounded-md text-base font-medium hover:text-purple-300 transition"
+            >Home</a
+          >
+          <a
+            href="#about"
+            class="block px-3 py-2 rounded-md text-base font-medium hover:text-purple-300 transition"
+            >About</a
+          >
+          <a
+            href="#experience"
+            class="block px-3 py-2 rounded-md text-base font-medium hover:text-purple-300 transition"
+            >Experience</a
+          >
+          <a
+            href="#skills"
+            class="block px-3 py-2 rounded-md text-base font-medium hover:text-purple-300 transition"
+            >Skills</a
+          >
+          <a
+            href="#contact"
+            class="block px-3 py-2 rounded-md text-base font-medium hover:text-purple-300 transition"
+            >Contact</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
+    >
+      <div
+        class="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center"
+      >
+        <div class="md:w-1/2 text-center md:text-left mb-12 md:mb-0">
+          <h1 class="text-4xl md:text-6xl font-bold mb-4 glow">
+            <span class="gradient-text">Roy Rangga Mandala</span>
+          </h1>
+          <h2 class="text-xl md:text-2xl mb-6 text-gray-300">
+            Web Developer & Coffee Entrepreneur
+          </h2>
+          <p class="text-lg mb-8 max-w-lg text-gray-400">
+            Passionate about web development, coffee business, and creative
+            digital design. Combining technology with entrepreneurial spirit.
+          </p>
+          <div class="flex flex-wrap justify-center md:justify-start gap-4">
+            <a
+              href="#contact"
+              class="px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium hover:opacity-90 transition"
+            >
+              Contact Me
+            </a>
+            <a
+              href="#about"
+              class="px-6 py-3 rounded-full border border-gray-600 text-white font-medium hover:bg-gray-800 transition"
+            >
+              Learn More
+            </a>
+          </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+          <div class="cube-container">
+            <div class="cube">
+              <div
+                class="cube-face front flex flex-col items-center justify-center"
+              >
+                <i class="fas fa-code text-4xl mb-2"></i>
+                <span class="text-sm">Web Dev</span>
+              </div>
+              <div
+                class="cube-face back flex flex-col items-center justify-center"
+              >
+                <i class="fas fa-coffee text-4xl mb-2"></i>
+                <span class="text-sm">Coffee</span>
+              </div>
+              <div
+                class="cube-face right flex flex-col items-center justify-center"
+              >
+                <i class="fas fa-palette text-4xl mb-2"></i>
+                <span class="text-sm">Design</span>
+              </div>
+              <div
+                class="cube-face left flex flex-col items-center justify-center"
+              >
+                <i class="fas fa-music text-4xl mb-2"></i>
+                <span class="text-sm">Music</span>
+              </div>
+              <div
+                class="cube-face top flex flex-col items-center justify-center"
+              >
+                <i class="fas fa-rocket text-4xl mb-2"></i>
+                <span class="text-sm">Future</span>
+              </div>
+              <div
+                class="cube-face bottom flex flex-col items-center justify-center"
+              >
+                <i class="fas fa-lightbulb text-4xl mb-2"></i>
+                <span class="text-sm">Ideas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="absolute bottom-10 left-0 right-0 flex justify-center">
+        <a href="#about" class="text-gray-400 hover:text-white animate-bounce">
+          <i class="fas fa-chevron-down text-2xl"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 relative">
+      <div class="container mx-auto px-6 md:px-12">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            <span class="gradient-text">About Me</span>
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-cyan-500 to-purple-600 mx-auto"
+          ></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center gap-12">
+          <div class="lg:w-1/3">
+            <div class="card-glass p-8 rounded-2xl hover-scale">
+              <div
+                class="w-48 h-48 mx-auto mb-6 overflow-hidden rounded-full border-4 border-gray-700"
+              >
+                <img
+                  src="profil.jpeg"
+                  alt="Profile"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <h3 class="text-xl font-bold text-center mb-2">
+                Roy Rangga Mandala
+              </h3>
+              <p class="text-gray-400 text-center mb-4">
+                Web Developer & Entrepreneur
+              </p>
+
+              <div class="space-y-4">
+                <div class="flex items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mr-3"
+                  >
+                    <i class="fas fa-map-marker-alt text-purple-500"></i>
+                  </div>
+                  <span>Grobogan, Indonesia</span>
+                </div>
+                <div class="flex items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mr-3"
+                  >
+                    <i class="fas fa-birthday-cake text-cyan-500"></i>
+                  </div>
+                  <span>20 April 2008</span>
+                </div>
+                <div class="flex items-center">
+                  <div
+                    class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mr-3"
+                  >
+                    <i class="fas fa-graduation-cap text-purple-500"></i>
+                  </div>
+                  <span>TELKOM UNIVERSITY</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:w-2/3">
+            <div class="card-glass p-8 rounded-2xl hover-scale">
+              <h3 class="text-2xl font-bold mb-6 gradient-text">
+                Personal Profile
+              </h3>
+              <p class="text-gray-300 mb-6">
+                I am a highly motivated individual with strong attention to
+                detail and the ability to adapt to new environments. Experienced
+                in small business and printing production, with a passion for
+                coffee, technology, and web development.
+              </p>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg">
+                  <h4 class="font-bold text-lg mb-3 text-cyan-400">
+                    Interests
+                  </h4>
+                  <ul class="space-y-2">
+                    <li class="flex items-center">
+                      <i class="fas fa-coffee text-purple-500 mr-2"></i>
+                      Coffee & Culinary Business
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-code text-cyan-500 mr-2"></i>
+                      Web Development & Technology
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-paint-brush text-purple-500 mr-2"></i>
+                      Digital Design & Creativity
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-music text-cyan-500 mr-2"></i>
+                      Music & Indie Band (Inspired by Perunggu)
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="bg-gray-900 bg-opacity-50 p-4 rounded-lg">
+                  <h4 class="font-bold text-lg mb-3 text-purple-400">
+                    Characteristics
+                  </h4>
+                  <ul class="space-y-2">
+                    <li class="flex items-center">
+                      <i class="fas fa-bolt text-cyan-500 mr-2"></i>
+                      High Work Ethic
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-search text-purple-500 mr-2"></i>
+                      Detail-Oriented
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-users text-cyan-500 mr-2"></i>
+                      Team Player
+                    </li>
+                    <li class="flex items-center">
+                      <i class="fas fa-brain text-purple-500 mr-2"></i>
+                      Quick Learner
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <span
+                  class="px-3 py-1 rounded-full bg-gray-800 text-sm flex items-center"
+                >
+                  <i class="fas fa-fire text-cyan-500 mr-1"></i> Motivated
+                </span>
+                <span
+                  class="px-3 py-1 rounded-full bg-gray-800 text-sm flex items-center"
+                >
+                  <i class="fas fa-lightbulb text-purple-500 mr-1"></i> Creative
+                </span>
+                <span
+                  class="px-3 py-1 rounded-full bg-gray-800 text-sm flex items-center"
+                >
+                  <i class="fas fa-clock text-cyan-500 mr-1"></i> Disciplined
+                </span>
+                <span
+                  class="px-3 py-1 rounded-full bg-gray-800 text-sm flex items-center"
+                >
+                  <i class="fas fa-heart text-purple-500 mr-1"></i> Passionate
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 bg-gray-900 bg-opacity-50">
+      <div class="container mx-auto px-6 md:px-12">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            <span class="gradient-text">My Journey</span>
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-cyan-500 to-purple-600 mx-auto"
+          ></div>
+        </div>
+
+        <div class="max-w-3xl mx-auto">
+          <div class="timeline-item">
+            <div class="card-glass p-6 rounded-xl hover-scale">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold text-cyan-400">
+                  Coffee Shop Owner
+                </h3>
+                <span class="px-3 py-1 bg-gray-800 rounded-full text-sm"
+                  >2022 - 2023</span
+                >
+              </div>
+              <p class="text-gray-300 mb-4">
+                Ran a small coffee business, handling everything from
+                production, marketing to customer service. Managed daily
+                finances and operations while learning valuable entrepreneurial
+                skills.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Entrepreneurship</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Customer Service</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Financial Management</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Marketing</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="card-glass p-6 rounded-xl hover-scale">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold text-purple-400">
+                  Printing Factory Employee
+                </h3>
+                <span class="px-3 py-1 bg-gray-800 rounded-full text-sm"
+                  >2023</span
+                >
+              </div>
+              <p class="text-gray-300 mb-4">
+                Worked in the production and packaging department of a printing
+                factory. Collaborated with a team to meet production targets
+                while maintaining quality standards.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Teamwork</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Quality Control</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Production</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Time Management</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="card-glass p-6 rounded-xl hover-scale">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold text-cyan-400">
+                  Web Development Learner
+                </h3>
+                <span class="px-3 py-1 bg-gray-800 rounded-full text-sm"
+                  >Present</span
+                >
+              </div>
+              <p class="text-gray-300 mb-4">
+                Currently expanding my knowledge in web development, focusing on
+                HTML, CSS, and JavaScript. Exploring modern design concepts and
+                tools like VS Code to build creative digital solutions.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >HTML/CSS</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >JavaScript</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >VS Code</span
+                >
+                <span class="px-2 py-1 rounded-full bg-gray-800 text-xs"
+                  >Modern Design</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20">
+      <div class="container mx-auto px-6 md:px-12">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            <span class="gradient-text">My Skills</span>
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-cyan-500 to-purple-600 mx-auto"
+          ></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div class="card-glass p-6 rounded-xl hover-scale">
+            <h3 class="text-xl font-bold mb-6 text-cyan-400">
+              Technical Skills
+            </h3>
+
+            <div class="space-y-5">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">HTML/CSS</span>
+                  <span class="text-gray-400">75%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 75%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">JavaScript</span>
+                  <span class="text-gray-400">50%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 50%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">VS Code</span>
+                  <span class="text-gray-400">70%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 70%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">Web Design</span>
+                  <span class="text-gray-400">65%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 65%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-glass p-6 rounded-xl hover-scale">
+            <h3 class="text-xl font-bold mb-6 text-purple-400">
+              Professional Skills
+            </h3>
+
+            <div class="space-y-5">
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">Communication</span>
+                  <span class="text-gray-400">85%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 85%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">Business Management</span>
+                  <span class="text-gray-400">80%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 80%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">Teamwork</span>
+                  <span class="text-gray-400">90%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 90%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="font-medium">Adaptability</span>
+                  <span class="text-gray-400">95%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 95%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
+        >
+          <div class="card-glass p-6 rounded-xl text-center hover-scale">
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center"
+            >
+              <i class="fas fa-coffee text-2xl text-white"></i>
+            </div>
+            <h4 class="font-bold mb-2">Coffee Passion</h4>
+            <p class="text-sm text-gray-400">
+              From bean to brew, understanding the art of coffee
+            </p>
+          </div>
+
+          <div class="card-glass p-6 rounded-xl text-center hover-scale">
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-500 to-cyan-600 flex items-center justify-center"
+            >
+              <i class="fas fa-laptop-code text-2xl text-white"></i>
+            </div>
+            <h4 class="font-bold mb-2">Tech Enthusiast</h4>
+            <p class="text-sm text-gray-400">
+              Always exploring new technologies and tools
+            </p>
+          </div>
+
+          <div class="card-glass p-6 rounded-xl text-center hover-scale">
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center"
+            >
+              <i class="fas fa-paint-brush text-2xl text-white"></i>
+            </div>
+            <h4 class="font-bold mb-2">Creative Mind</h4>
+            <p class="text-sm text-gray-400">
+              Bringing ideas to life through design
+            </p>
+          </div>
+
+          <div class="card-glass p-6 rounded-xl text-center hover-scale">
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-500 to-cyan-600 flex items-center justify-center"
+            >
+              <i class="fas fa-headphones text-2xl text-white"></i>
+            </div>
+            <h4 class="font-bold mb-2">Music Lover</h4>
+            <p class="text-sm text-gray-400">
+              Inspired by indie bands like Perunggu
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-900 bg-opacity-50">
+      <div class="container mx-auto px-6 md:px-12">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">
+            <span class="gradient-text">Get In Touch</span>
+          </h2>
+          <div
+            class="w-24 h-1 bg-gradient-to-r from-cyan-500 to-purple-600 mx-auto"
+          ></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="card-glass p-8 rounded-2xl hover-scale">
+            <h3 class="text-2xl font-bold mb-6 text-cyan-400">
+              Contact Information
+            </h3>
+
+            <div class="space-y-6">
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center mr-4"
+                >
+                  <i class="fas fa-map-marker-alt text-purple-500"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold">Location</h4>
+                  <p class="text-gray-400">
+                    Desa Sukorejo, Dusun Sedayu, RT 02 RW 07, Grobogan
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center mr-4"
+                >
+                  <i class="fas fa-envelope text-cyan-500"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold">Email</h4>
+                  <p class="text-gray-400">anjyir958@gmail.com</p>
+                </div>
+              </div>
+
+              <div class="flex items-start">
+                <div
+                  class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center mr-4"
+                >
+                  <i class="fas fa-phone-alt text-purple-500"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold">Phone</h4>
+                  <p class="text-gray-400">085298267303</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <h4 class="font-bold mb-4">Connect With Me</h4>
+              <div class="flex space-x-4">
+                <a
+                  href="#"
+                  class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-purple-600 transition"
+                >
+                  <i class="fab fa-instagram text-lg"></i>
+                </a>
+                <a
+                  href="#"
+                  class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-green-500 transition"
+                >
+                  <i class="fab fa-whatsapp text-lg"></i>
+                </a>
+                <a
+                  href="https://github.com/namakamu"
+                  class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition"
+                >
+                  <i class="fab fa-github text-lg"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-glass p-8 rounded-2xl hover-scale">
+            <h3 class="text-2xl font-bold mb-6 text-purple-400">
+              Send Me a Message
+            </h3>
+            <form>
+              <div class="mb-4">
+                <label for="name" class="block mb-2 font-medium"
+                  >Your Name</label
+                >
+                <input
+                  type="text"
+                  id="name"
+                  class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="email" class="block mb-2 font-medium"
+                  >Your Email</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="subject" class="block mb-2 font-medium"
+                  >Subject</label
+                >
+                <input
+                  type="text"
+                  id="subject"
+                  class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                />
+              </div>
+
+              <div class="mb-6">
+                <label for="message" class="block mb-2 font-medium"
+                  >Message</label
+                >
+                <textarea
+                  id="message"
+                  rows="4"
+                  class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-medium hover:opacity-90 transition"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 bg-black bg-opacity-90">
+      <div class="container mx-auto px-6 md:px-12">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <span class="text-xl font-bold gradient-text"
+              >Roy Rangga Mandala</span
+            >
+          </div>
+          <div class="text-gray-400 text-sm">
+            &copy; 2023 All Rights Reserved
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      document
+        .getElementById("mobile-menu-button")
+        .addEventListener("click", function () {
+          const menu = document.getElementById("mobile-menu");
+          menu.classList.toggle("hidden");
+        });
+
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          const targetId = this.getAttribute("href");
+          const targetElement = document.querySelector(targetId);
+
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: "smooth",
+          });
+
+          // Close mobile menu if open
+          const mobileMenu = document.getElementById("mobile-menu");
+          if (!mobileMenu.classList.contains("hidden")) {
+            mobileMenu.classList.add("hidden");
+          }
+        });
+      });
+
+      // Animate skill bars on scroll
+      function animateSkillBars() {
+        const skillBars = document.querySelectorAll(".skill-progress");
+        skillBars.forEach((bar) => {
+          const width = bar.style.width;
+          bar.style.width = "0";
+          setTimeout(() => {
+            bar.style.width = width;
+          }, 100);
+        });
+      }
+
+      // Intersection Observer for scroll animations
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (entry.target.id === "skills") {
+                animateSkillBars();
+              }
+              entry.target.classList.add("animate-fadeIn");
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      document.querySelectorAll("section").forEach((section) => {
+        observer.observe(section);
+      });
+
+      // 3D Cube Animation with Three.js
+      function init3DCube() {
+        const container = document.getElementById("cube-scene");
+        if (!container) return;
+
+        const width = 200;
+        const height = 200;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          width / height,
+          0.1,
+          1000
+        );
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(width, height);
+        container.appendChild(renderer.domElement);
+
+        // Create a cube
+        const geometry = new THREE.BoxGeometry(3, 3, 3);
+        const edges = new THREE.EdgesGeometry(geometry);
+        const line = new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.8,
+          })
+        );
+
+        scene.add(line);
+
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+          requestAnimationFrame(animate);
+
+          line.rotation.x += 0.01;
+          line.rotation.y += 0.01;
+
+          renderer.render(scene, camera);
+        }
+
+        animate();
+      }
+
+      // Initialize particles.js
+      function initParticles() {
+        const particlesJSConfig = {
+          particles: {
+            number: {
+              value: 80,
+              density: {
+                enable: true,
+                value_area: 800,
+              },
+            },
+            color: {
+              value: "#00ffff",
+            },
+            shape: {
+              type: "circle",
+              stroke: {
+                width: 0,
+                color: "#000000",
+              },
+              polygon: {
+                nb_sides: 5,
+              },
+            },
+            opacity: {
+              value: 0.3,
+              random: false,
+              anim: {
+                enable: false,
+                speed: 1,
+                opacity_min: 0.1,
+                sync: false,
+              },
+            },
+            size: {
+              value: 3,
+              random: true,
+              anim: {
+                enable: false,
+                speed: 40,
+                size_min: 0.1,
+                sync: false,
+              },
+            },
+            line_linked: {
+              enable: true,
+              distance: 150,
+              color: "#00ffff",
+              opacity: 0.2,
+              width: 1,
+            },
+            move: {
+              enable: true,
+              speed: 2,
+              direction: "none",
+              random: false,
+              straight: false,
+              out_mode: "out",
+              bounce: false,
+              attract: {
+                enable: false,
+                rotateX: 600,
+                rotateY: 1200,
+              },
+            },
+          },
+          interactivity: {
+            detect_on: "canvas",
+            events: {
+              onhover: {
+                enable: true,
+                mode: "grab",
+              },
+              onclick: {
+                enable: true,
+                mode: "push",
+              },
+              resize: true,
+            },
+            modes: {
+              grab: {
+                distance: 140,
+                line_linked: {
+                  opacity: 0.5,
+                },
+              },
+              bubble: {
+                distance: 400,
+                size: 40,
+                duration: 2,
+                opacity: 8,
+                speed: 3,
+              },
+              repulse: {
+                distance: 200,
+                duration: 0.4,
+              },
+              push: {
+                particles_nb: 4,
+              },
+              remove: {
+                particles_nb: 2,
+              },
+            },
+          },
+          retina_detect: true,
+        };
+
+        particlesJS("particles-js", particlesJSConfig);
+      }
+
+      // Initialize all animations when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        initParticles();
+        init3DCube();
+
+        // Add floating animation to elements
+        const floatingElements = document.querySelectorAll(".floating");
+        floatingElements.forEach((el, index) => {
+          gsap.to(el, {
+            y: 15,
+            duration: 2 + index * 0.3,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
